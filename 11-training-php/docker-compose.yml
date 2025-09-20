@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  db:
+    image: mysql:5.7
+    container_name: my_mysql
+    restart: always
+    environment:
+      MYSQL_DATABASE: mydb
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+      MYSQL_ROOT_PASSWORD: rootpassword
+    ports:
+      - "3307:3306"  # mở port cho MySQL để test từ ngoài
+    volumes:
+      - db_data:/var/lib/mysql
+
+  web:
+    build: .
+    container_name: php-apache
+    depends_on:
+      - db
+    ports:
+      - "8085:80"
+    volumes:
+      - .:/var/www/html
+    restart: always
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: my_phpmyadmin
+    depends_on:
+      - db
+    ports:
+      - "8086:80"
+    environment:
+      PMA_HOST: db
+      MYSQL_ROOT_PASSWORD: rootpassword
+    restart: always
+
+volumes:
+  db_data:
+
